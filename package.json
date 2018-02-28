@@ -1,0 +1,9 @@
+{
+  "name": "da_project",
+  "version": "1.0.0",
+  "description": "FA Project",
+  "main": "index.js",
+  "repository": "https://github.com/yumit412/DAProject.git",
+  "author": "Mintak <yumit412@gmail.com>",
+  "license": "MIT"
+}

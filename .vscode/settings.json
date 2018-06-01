@@ -1,0 +1,18 @@
+{
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/node_modules": true,
+        "**/tmp": true,
+        "**/yarn.lock": true,
+        "**/yarn-error.log": true,
+        ".nuxt" : true,
+        ".vscode": true
+    },
+    "prettier.singleQuote": true,
+    "prettier.semi": false,
+    "eslint.enable": true,
+}

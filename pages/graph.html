@@ -71,6 +71,39 @@
 <body>
     <!-- <div class="chart" id="time_table"></div> -->
     <script type="text/javascript">
+        class Action {
+            constructor(name) {
+                this.name = 'action' || name
+                this.start = Date.now()
+                this.end = Date.now() + (10 * 1000)
+                this.subaction = []
+            }
+
+            AddSubAction(action) {
+                if (!action.start || !action.end) return
+
+                if (action.start < this.start) this.start = action.start
+                if (action.end > this.end) this.end = action.end
+
+                this.subaction.push(action)
+            }
+        }
+        let main_action = new Action
+        let subaction = new Action
+        subaction.start = main_action.end + (5 * 1000)
+        subaction.end = subaction.start + (5 * 1000)
+
+        main_action.AddSubAction(subaction)
+
+        subaction = new Action
+
+        subaction.start = main_action.end + (5 * 1000)
+        subaction.end = subaction.start + (5 * 1000)
+        main_action.AddSubAction(subaction)
+
+
+    </script>
+    <script type="text/javascript">
         var margin = {
             left: 40,
             right: 40,
@@ -80,8 +113,12 @@
             width = 960 - margin.left - margin.right,
             height = 500 - margin.top - margin.bottom
 
+        let start = main_action.start
+        let end = main_action.end
+
         var x_scale = d3.scaleTime()
-            .domain([new Date(2018, 6, 1, 17, 10, 30, 10), new Date(2018, 6, 1, 17, 16, 20, 20) - 1])
+            // .domain([new Date(start), new Date(end)])
+            .domain([start, end])
             .rangeRound([0, width])
 
         var svg = d3.select("body").append("svg")
@@ -94,7 +131,7 @@
             .attr("class", "axis axis--grid")
             .attr("transform", "translate(0," + height + ")")
             .call(d3.axisBottom(x_scale)
-                .ticks(d3.timeSecond, 30)
+                .ticks(d3.timeMillisecond, 30)
                 .tickSize(-height)
                 .tickFormat(function () { return null; })
             )
@@ -102,17 +139,37 @@
             .classed("tick--minor", function (d) { return d.getHours(); });
 
 
-
         svg.append('g')
             .attr('class', 'axis axis--x')
             .attr('transform', 'translate(0, ' + height + ')')
             .call(d3.axisBottom(x_scale)
-                .ticks(d3.timeMinute)
+                .ticks(d3.timeMicrosecond)
                 .tickPadding(0)
             )
             .attr('text-anchor', null)
             .selectAll('text')
             .attr('x', 6)
+
+        svg.append("defs").append("clipPath")
+            .attr("id", "clip")
+            .append("rect")
+            .attr("width", width)
+            .attr("height", height);
+
+        let itemRects = svg.append("g")
+            .attr("clip-path", "url(#clip)");
+
+        let rects = itemRects.selectAll("rect")
+            .data(main_action.subaction)
+            .attr('x', function (d) { return x_scale(d.start) })
+            .attr('width', function (d) { return x_scale(d.end) - x_scale(d.start) })
+
+        rects.enter().append('rect')
+            .attr("class", function (d) { return "miniItem1"; })
+            .attr('x', function (d) { return x_scale(d.start) })
+            .attr('y', function (d) { return 100 })
+            .attr('height', function (d) { return 100 })
+            .attr('width', function (d) { return x_scale(d.end) - x_scale(d.start) })
 
         svg.append("g")
             .attr("class", "brush")
@@ -120,20 +177,38 @@
                 .extent([[0, 0], [width, height]])
                 .on("end", brushended));
 
+
+
         function brushended() {
             if (!d3.event.sourceEvent) return; // Only transition after input.
             if (!d3.event.selection) return; // Ignore empty selections.
 
             var d0 = d3.event.selection.map(x_scale.invert),
-                d1 = d0.map(d3.timeMinute.round);
+                d1 = d0.map(d3.timeMillisecond.round);
 
             // If empty when rounded, use floor & ceil instead.
             if (d1[0] >= d1[1]) {
-                d1[0] = d3.timeMinute.floor(d0[0]);
-                d1[1] = d3.timeMinute.offset(d1[0]);
+                d1[0] = d3.timeMillisecond.floor(d0[0]);
+                d1[1] = d3.timeMillisecond.offset(d1[0]);
             }
 
             d3.select(this).transition().call(d3.event.target.move, d1.map(x_scale));
+        }
+
+        function display() {
+            visItems = items.filter(function (d) { return d.start < maxExtent && d.end > minExtent; });
+
+            let rects = itemRects.selectAll("rect")
+                .data(visItems, function (d) { return d.id; })
+                .attr("x", function (d) { return x1(d.start); })
+                .attr("width", function (d) { return x1(d.end) - x1(d.start); });
+
+            rects.enter().append("rect")
+                .attr("class", function (d) { return "miniItem" + d.lane; })
+                .attr("x", function (d) { return x1(d.start); })
+                .attr("y", function (d) { return y1(d.lane) + 10; })
+                .attr("width", function (d) { return x1(d.end) - x1(d.start); })
+                .attr("height", function (d) { return .8 * y1(1); });
         }
 
     </script>

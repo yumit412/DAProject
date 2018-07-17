@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="UTF-8">
+
+<head>
+  <meta charset="UTF-8">
+  <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+</head>
+
+<style>
+  .chart {
+    shape-rendering: crispEdges;
+  }
+
+  #wafer-ellipse {
+    shape-rendering: geometricPrecision;
+    fill: aliceblue;
+    stroke: black;
+    stroke: darkgrey;
+    stroke-width: 3px;
+  }
+
+</style>
+
+
+<body>
+  <svg width='1024' height='600' viewBox="0 0 2020 600">
+    <!-- list resourses in a <defs> element -->
+    <defs>
+      <g id='wafer-ellipse'>
+        <ellipse cx='5' cy='5' rx="150" ry="20" fill='grey' stroke='none' />
+        <ellipse rx="150" ry="20" />
+      </g>
+      <g id="def-wafers">
+        <rect x='0' y='100' width='400' height='150' fill='white' stroke='black' />
+        <ellipse cx='200' cy='250' rx="200" ry="20" fill='white' stroke='black' />
+        <use xlink:href="#wafer-ellipse" transform="translate(200 250)" />
+        <use xlink:href="#wafer-ellipse" transform="translate(200 240)" />
+        <use xlink:href="#wafer-ellipse" transform="translate(200 230)" />
+        <use xlink:href="#wafer-ellipse" transform="translate(200 220)" />
+        <use xlink:href="#wafer-ellipse" transform="translate(200 210)" />
+        <use xlink:href="#wafer-ellipse" transform="translate(200 200)" />
+        <use xlink:href="#wafer-ellipse" transform="translate(200 190)" />
+        <use xlink:href="#wafer-ellipse" transform="translate(200 180)" />
+        <use xlink:href="#wafer-ellipse" transform="translate(270 175)" />
+        <use xlink:href="#wafer-ellipse" transform="translate(200 160)" />
+        <use xlink:href="#wafer-ellipse" transform="translate(200 150)" />
+        <use xlink:href="#wafer-ellipse" transform="translate(200 140)" />
+        <use xlink:href="#wafer-ellipse" transform="translate(200 130)" />
+        <use xlink:href="#wafer-ellipse" transform="translate(200 120)" />
+        <ellipse cx='200' cy='100' rx="200" ry="20" fill='white' stroke='black' />
+      </g>
+
+    </defs>
+
+    <!-- reference resourses by ID in xlink:href attribute -->
+    <use xlink:href="#def-wafers" transform="translate(505 0)" />
+    <use xlink:href="#def-wafers" transform="translate(1010 0)" />
+    <use xlink:href="#def-wafers" transform="translate(1515 0)" />
+  </svg>
+  </div>
+
+  <script type="text/javascript">
+    var svg = d3.select("body").select("svg")
+    svg.append('use')
+      .attr('xlink:href', '#def-wafers')
+      .transition().attr('transform', 'translate(500,-100)')
+    var obj = svg.append('use')
+      .attr('xlink:href', '#def-wafers')
+      .transition().attr('transform', 'translate(200 100)')
+
+    obj.transition().attr('transform', 'translate(0,0)')
+
+
+  </script>
+
+</body>
+
+</html>

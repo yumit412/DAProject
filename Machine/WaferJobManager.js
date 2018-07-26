@@ -43,4 +43,16 @@ class WaferJobManager {
 
 const waferJobManager = new WaferJobManager()
 
+function CreateDummyWafer() {
+  let option = { path: ['foup1', 'aligner', 'foup2'] }
+
+  //create test wafers
+  let wafers = new Array(25).fill(null).map(v => new Wafer(option))
+
+  waferJobManager.que.push(wafers)
+}
+
+CreateDummyWafer()
+console.log(waferJobManager.que)
+
 module.exports = waferJobManager

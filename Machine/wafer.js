@@ -107,6 +107,15 @@ class Robot {
   async doMove() {
     let wafer = {}
     this.isbusy = true
+    // 만약 ... 집을수 있는 웨이퍼가 없다면...
+    let wafer = this.waferQue.getPickableWafer()
+    // 손이 있는 웨이퍼를 놓는다.
+
+    // 집읍수 있는 웨이퍼가 있다면...
+    // findNextPossibleWafer()
+    // = 웨이퍼의 다음 타겟이 비어있는 상태이고, 로봇의 손이 자유롭다면
+    // 집는다...
+
     while ((wafer = this.waferQue.pop())) {
       if (this.noFreeHand()) {
         // 손에 있는걸 놓는다.
@@ -114,13 +123,6 @@ class Robot {
         let target_staget = wafer.path[0]
         await this.Place(wafer, target)
       }
-
-      // 만약 ... 집을수 있는 웨이퍼가 없다면...
-      // 손이 있는 웨이퍼를 놓는다.
-
-      // 집읍수 있는 웨이퍼가 있다면...
-      // = 웨이퍼의 다음 타겟이 비어있는 상태이고, 로봇의 손이 자유롭다면
-      // 집는다...
 
       let target_stage = wafer.path[0]
       wafer.path.shift()
@@ -207,6 +209,14 @@ class Foup {
     robot.addQue(this.wafers)
   }
 
+  FindNextPossibleWafer() {
+    let wafer = this.wafers.find(function(wafer) {
+      return wafer.nextStage().isFree() == true
+    })
+
+    return wafer
+  }
+
   async WakeUp() {}
 }
 
@@ -215,6 +225,17 @@ class Wafer {
     option = option || {}
     this.id = option.id || undefined
     this.path = option.path || []
+    this.stage = this.path[Symbol.iterator]()
+    this.currentIndex = 0
+    this.nextIndex = 0
+  }
+
+  nextStage() {
+    let nextStage = null
+    return (nextStage =
+      this.currentIndex + 1 < this.path.length
+        ? this.path[this.currentIndex + 1]
+        : undefined)
   }
 }
 
@@ -226,16 +247,16 @@ aligner = new Aligner()
 
 function testcode() {
   let option = { path: [foup1, aligner, foup2] }
+
+  //create test wafers
   let wafers = new Array(25).fill(null).map(v => new Wafer(option))
+
   foup1.wafers = wafers
 
-  let id = 1
-  foup1.wafers.forEach(wafer => {
-    wafer.id = id
-    id = id + 1
-  })
+  console.log(foup1.wafers[0])
+  let stage = foup1.wafers[0].nextStage()
 
-  foup1.SortWafers()
+  console.log(stage)
 }
 
 testcode()
